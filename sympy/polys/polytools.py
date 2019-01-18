@@ -316,10 +316,13 @@ class Poly(Expr):
         ========
 
         >>> from sympy import Poly
-        >>> from sympy.abc import x
+        >>> from sympy.abc import x, y
 
         >>> Poly(x**2 + 1, x).args
-        (x**2 + 1,)
+        (x**2 + 1, x)
+
+        >>> Poly(x**2 + 1, x, y).args
+        (x**2 + 1, x, y)
 
         """
         return (self.as_expr(),) + self.gens

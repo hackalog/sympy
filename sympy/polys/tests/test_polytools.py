@@ -64,6 +64,8 @@ from sympy.simplify import simplify
 from sympy.abc import a, b, c, d, p, q, t, w, x, y, z
 from sympy import MatrixSymbol
 
+import pickle
+
 def _epsilon_eq(a, b):
     for x, y in zip(a, b):
         if abs(x - y) > 1e-10:
@@ -353,7 +355,7 @@ def test_Poly__new__():
 
 
 def test_Poly__args():
-    assert Poly(x**2 + 1).args == (x**2 + 1,)
+    assert Poly(x**2 + 1).args == (x**2 + 1, x)
 
 
 def test_Poly__gens():
@@ -3291,3 +3293,27 @@ def test_issue_15669():
     expr = (16*x**3/(-x**2 + sqrt(8*x**2 + (x**2 - 2)**2) + 2)**2 -
         2*2**(S(4)/5)*x*(-x**2 + sqrt(8*x**2 + (x**2 - 2)**2) + 2)**(S(3)/5) + 10*x)
     assert factor(expr, deep=True) == x*(x**2 + 2)
+
+def test_poly_copy():
+    # issue 15798
+    obj = Poly('x+y', x, y, z)
+    o2 = obj.copy()
+    assert obj == o2
+
+    # issue 9918
+    obj = Poly(1, x)
+    o2 = obj.copy()
+    assert obj == o2
+
+def test_poly_pickle():
+    # issue 15798
+    obj = Poly('x+y', x, y, z)
+    obj_p = pickle.dumps(obj)
+    o2 = pickle.loads(obj_p)
+    assert obj == o2
+
+    # issue 9918
+    obj = Poly(1, x)
+    obj_p = pickle.dumps(obj)
+    o2 = pickle.loads(obj_p)
+    assert obj == o2
