@@ -322,7 +322,7 @@ class Poly(Expr):
         (x**2 + 1,)
 
         """
-        return (self.as_expr(),)
+        return (self.as_expr(),) + self.gens
 
     @property
     def gen(self):
