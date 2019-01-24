@@ -33,6 +33,7 @@ from sympy.polys.groebnertools import groebner as _groebner
 from sympy.polys.fglmtools import matrix_fglm
 from sympy.polys.monomials import Monomial
 from sympy.polys.orderings import monomial_key
+from sympy.polys.domains import Domain
 
 from sympy.polys.polyerrors import (
     OperationNotSupported, DomainError,
@@ -110,6 +111,14 @@ class Poly(Expr):
 
     def __new__(cls, rep, *gens, **args):
         """Create a new polynomial instance out of something useful. """
+
+        # We add the domain to the end of gens in `.args`.
+        # Re-add it as a keyword argument
+        # see issues #15798, #9918,
+        if len(gens) and isinstance(gens[-1], Domain):
+            domain = gens[-1]
+            args['domain'] = domain
+            gens = gens[:-1]
         opt = options.build_options(gens, args)
 
         if 'order' in opt:
@@ -325,7 +334,7 @@ class Poly(Expr):
         (x**2 + 1, x, y)
 
         """
-        return (self.as_expr(),) + self.gens
+        return (self.as_expr(),) + self.gens + (self.domain,)
 
     @property
     def gen(self):
