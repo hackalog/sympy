@@ -6,6 +6,7 @@ from sympy.core import Basic, Add, sympify
 from sympy.core.compatibility import iterable
 from sympy.core.exprtools import gcd_terms
 from sympy.utilities import public
+from sympy.polys.domains import Domain
 
 @public
 def together(expr, deep=False):
@@ -76,7 +77,13 @@ def together(expr, deep=False):
 
                 return expr.__class__(base, exp)
             else:
-                return expr.__class__(*[ _together(arg) for arg in expr.args[:-1] ])
+                arglist = expr.args
+                # Special case for Poly, which must be stripped of generators, domain
+                # See issue #15798
+                if isinstance(arglist[-1], Domain):
+                    arglist = (expr.as_expr(),)
+                ret = expr.__class__(*[ _together(arg) for arg in arglist])
+                return ret
         elif iterable(expr):
             return expr.__class__([ _together(ex) for ex in expr ])
 
